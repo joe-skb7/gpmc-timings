@@ -1,0 +1,6 @@
+Console application for dealing with GPMC timings.
+Designed for DRA7xx and OMAP-based SoCs.
+
+Features:
+ - parsing CONFIG1..CONFIG6 registers and print timings
+ - converting timings (specified in text file) to register values
