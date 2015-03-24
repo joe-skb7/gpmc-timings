@@ -6,6 +6,8 @@
 #include <unistd.h>
 #include <errno.h>
 
+/* Print explanations/units for timings */
+#define CONFIG_TIM_EXPL
 /* Show optional timings (as well as required ones) */
 #define CONFIG_OPT_TIMINGS
 /* All timings should be specified in file */
@@ -268,14 +270,22 @@ static void print_timing(size_t ti)
 	struct timing *t = &timings[ti];
 
 	if (t->is_timing) {
+#ifdef CONFIG_TIM_EXPL
 		printf("%-25s = %d\tticks\n", t->name, t->value);
+#else
+		printf("%-25s = %d\n", t->name, t->value);
+#endif
 	} else if (t->pi_len > 0) {
 		size_t i;
 
 		for (i = 0; i < t->pi_len; ++i) {
 			if (t->value == t->pi[i].val) {
-				printf("%-25s = 0x%x (%s)\n", t->name,
-						t->value, t->pi[i].desc);
+#ifdef CONFIG_TIM_EXPL
+				printf("%-25s = 0x%x (%s)\n", t->name, t->value,
+						t->pi[i].desc);
+#else
+				printf("%-25s = 0x%x\n", t->name, t->value);
+#endif
 				return;
 			}
 		}
