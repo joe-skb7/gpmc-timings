@@ -226,14 +226,7 @@ static const size_t req_timings[] = {
 	39,	/* wr-access */
 };
 
-static void print_usage(char *app)
-{
-	printf("Usage:\n");
-	printf("  %s -p CONFIG1..CONFIG6\n", app);
-	printf("  %s -y <file>\n\n", app);
-	printf("-y file       - yield registers values from file\n");
-	printf("-p registers  - parse and print registers values\n");
-}
+/* -------------------------------------------------------------------------- */
 
 static void parse_timings(uint32_t *config_regs)
 {
@@ -460,11 +453,82 @@ static int populate_config_regs(uint32_t *config_regs)
 
 /* -------------------------------------------------------------------------- */
 
-int main(int argc, char *argv[])
+static void print_usage(char *app)
+{
+	printf("Usage:\n");
+	printf("  %s -p CONFIG1..CONFIG6\n", app);
+	printf("  %s -y <file>\n\n", app);
+	printf("-y file       - yield registers values from file\n");
+	printf("-p registers  - parse and print registers values\n");
+}
+
+static int do_parse_registers(int argc, char *argv[])
 {
 	uint32_t config_regs[CONFIG_NUM] = { 0 };
 	size_t i;
 
+	if (argc != CONFIG_NUM + 2) {
+		fprintf(stderr, "Wrong arguments count\n");
+		print_usage(argv[0]);
+		return EXIT_FAILURE;
+	}
+
+	/* Parse command line */
+	for (i = 0; i < CONFIG_NUM; ++i)
+		sscanf(argv[i+2], "%x", &config_regs[i]);
+
+	parse_timings(config_regs);
+	process_paragran();
+	print_req_timings();
+	print_opt_timings();
+
+	return EXIT_SUCCESS;
+}
+
+static int do_yield_registers(int argc, char *argv[])
+{
+	uint32_t config_regs[CONFIG_NUM] = { 0 };
+	char *fname;
+	int res;
+	size_t i;
+
+	if (argc != 1 + 2) {
+		fprintf(stderr, "Wrong arguments count\n");
+		print_usage(argv[0]);
+		return EXIT_FAILURE;
+	}
+
+	fname = argv[2];
+
+	if (access(fname, F_OK) == -1) {
+		fprintf(stderr, "File \"%s\" doesn't exist\n", fname);
+		perror("Error");
+		return EXIT_FAILURE;
+	}
+
+	res = read_timings_file(fname);
+	if (res != 0) {
+		fprintf(stderr, "Error when reading file: %d\n", res);
+		return EXIT_FAILURE;
+	}
+
+	res = populate_config_regs(config_regs);
+	if (res != 0) {
+		fprintf(stderr, "Error when populating regs: %d\n",
+				res);
+		return EXIT_FAILURE;
+	}
+
+	setup_reserved_bits(config_regs);
+
+	for (i = 0; i < CONFIG_NUM; ++i)
+		printf("CONFIG%zu = 0x%08x\n", i+1, config_regs[i]);
+
+	return EXIT_SUCCESS;
+}
+
+int main(int argc, char *argv[])
+{
 	if (argc < 2+1) {
 		fprintf(stderr, "Wrong arguments count\n");
 		print_usage(argv[0]);
@@ -472,55 +536,9 @@ int main(int argc, char *argv[])
 	}
 
 	if (strcmp(argv[1], "-p") == 0) {
-		if (argc != CONFIG_NUM + 2) {
-			fprintf(stderr, "Wrong arguments count\n");
-			print_usage(argv[0]);
-			return EXIT_FAILURE;
-		}
-
-		/* Parse command line */
-		for (i = 0; i < CONFIG_NUM; ++i)
-			sscanf(argv[i+2], "%x", &config_regs[i]);
-
-		parse_timings(config_regs);
-		process_paragran();
-		print_req_timings();
-		print_opt_timings();
+		return do_parse_registers(argc, argv);
 	} else if (strcmp(argv[1], "-y") == 0) {
-		char *fname;
-		int res;
-
-		if (argc != 1 + 2) {
-			fprintf(stderr, "Wrong arguments count\n");
-			print_usage(argv[0]);
-			return EXIT_FAILURE;
-		}
-
-		fname = argv[2];
-
-		if (access(fname, F_OK) == -1) {
-			fprintf(stderr, "File \"%s\" doesn't exist\n", fname);
-			perror("Error");
-			return EXIT_FAILURE;
-		}
-
-		res = read_timings_file(fname);
-		if (res != 0) {
-			fprintf(stderr, "Error when reading file: %d\n", res);
-			return EXIT_FAILURE;
-		}
-
-		res = populate_config_regs(config_regs);
-		if (res != 0) {
-			fprintf(stderr, "Error when populating regs: %d\n",
-					res);
-			return EXIT_FAILURE;
-		}
-
-		setup_reserved_bits(config_regs);
-
-		for (i = 0; i < CONFIG_NUM; ++i)
-			printf("CONFIG%zu = 0x%08x\n", i+1, config_regs[i]);
+		return do_yield_registers(argc, argv);
 	} else {
 		fprintf(stderr, "Wrong arguments\n");
 		print_usage(argv[0]);
