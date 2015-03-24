@@ -401,7 +401,7 @@ static int read_timings_file(const char *fname)
 		}
 
 		if (!found) {
-			fprintf(stderr, "Wrong timing: \"%s\"\n", tim);
+			fprintf(stderr, "Error: Wrong timing: \"%s\"\n", tim);
 			ret = -3;
 			goto out2;
 		}
