@@ -391,6 +391,14 @@ static int read_timings_file(const char *fname)
 
 		for (i = 0; i < ARRAY_SIZE(timings); ++i) {
 			if (strcmp(timings[i].name, tim) == 0) {
+				if (tim_read[i]) {
+					fprintf(stderr,
+						"Error: Duplicate timing: "
+						"\"%s\"\n", tim);
+					ret = -3;
+					goto out2;
+				}
+
 				timings[i].value = val;
 				found = true;
 #ifdef CONFIG_FILE_ALL_TIM
@@ -402,7 +410,7 @@ static int read_timings_file(const char *fname)
 
 		if (!found) {
 			fprintf(stderr, "Error: Wrong timing: \"%s\"\n", tim);
-			ret = -3;
+			ret = -4;
 			goto out2;
 		}
 	}
@@ -417,7 +425,7 @@ static int read_timings_file(const char *fname)
 	}
 
 	if (!tim_read_ok) {
-		ret = -4;
+		ret = -5;
 		goto out2;
 	}
 #endif
