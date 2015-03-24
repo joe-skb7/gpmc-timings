@@ -448,16 +448,6 @@ static int populate_config_regs(uint32_t *config_regs)
 			fprintf(stderr,
 				"Error: timing \"%s\" has invalid value\n",
 				t->name);
-			fprintf(stderr, "(in CONFIG%d)\n", t->config_reg + 1);
-			fprintf(stderr, "\n");
-			fprintf(stderr, "t->val    = 0x%x\n", t->value);
-			fprintf(stderr, "right bit = %d\n", t->right_bit);
-			fprintf(stderr, "\n");
-			fprintf(stderr, "val       = 0x%x\n", val);
-			fprintf(stderr, "mask      = 0x%x\n", mask);
-			fprintf(stderr, "\n");
-			fprintf(stderr, "val & ~mask = 0x%x\n", val & ~mask);
-			fprintf(stderr, "\n");
 
 			return -1;
 		}
