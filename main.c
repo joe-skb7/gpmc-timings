@@ -6,8 +6,8 @@
 #include <unistd.h>
 #include <errno.h>
 
-/* Print explanations/units for timings */
-#define CONFIG_TIM_EXPL
+/* Print explanations and timings units */
+#define CONFIG_VERBOSE
 /* Show optional timings (as well as required ones) */
 #define CONFIG_OPT_TIMINGS
 /* All timings should be specified in file */
@@ -270,7 +270,7 @@ static void print_timing(size_t ti)
 	struct timing *t = &timings[ti];
 
 	if (t->is_timing) {
-#ifdef CONFIG_TIM_EXPL
+#ifdef CONFIG_VERBOSE
 		printf("%-25s = %d\tticks\n", t->name, t->value);
 #else
 		printf("%-25s = %d\n", t->name, t->value);
@@ -280,7 +280,7 @@ static void print_timing(size_t ti)
 
 		for (i = 0; i < t->pi_len; ++i) {
 			if (t->value == t->pi[i].val) {
-#ifdef CONFIG_TIM_EXPL
+#ifdef CONFIG_VERBOSE
 				printf("%-25s = 0x%x (%s)\n", t->name, t->value,
 						t->pi[i].desc);
 #else
@@ -300,7 +300,9 @@ static void print_req_timings(void)
 {
 	size_t i;
 
+#ifdef CONFIG_VERBOSE
 	printf("*** Required timings ***\n");
+#endif
 	for (i = 0; i < ARRAY_SIZE(req_timings); ++i)
 		print_timing(req_timings[i]);
 }
@@ -343,7 +345,9 @@ static void print_opt_timings(void)
 	}
 
 	/* Print optional timings array */
+#ifdef CONFIG_VERBOSE
 	printf("\n*** Optional timings ***\n");
+#endif
 	for (i = 0; i < opt_timings_count; ++i)
 		print_timing(opt_timings[i]);
 
