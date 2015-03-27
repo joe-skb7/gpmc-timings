@@ -7,13 +7,13 @@
 #include <errno.h>
 
 /* Print explanations and timings units */
-#define CONFIG_VERBOSE
+//#define CONFIG_VERBOSE
 /* Show optional timings (as well as required ones) */
 #define CONFIG_OPT_TIMINGS
 /* All timings should be specified in file */
 #define CONFIG_FILE_ALL_TIM
 /* Multiply timings by 2 if double latency bit is set */
-#define CONFIG_MUL_DOUBLE_LATENCY
+//#define CONFIG_MUL_DOUBLE_LATENCY
 
 #define ARRAY_SIZE(a)	(sizeof(a) / sizeof(a[0]))
 /* Generate bit mask: bits from "a" to "b" are set to "1" (b > a) */
