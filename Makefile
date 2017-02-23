@@ -1,10 +1,12 @@
 APP = gpmc-timings
 SOURCES = main.c
+CC = gcc
+CFLAGS = -Wall -O2
 
-default: $(SOURCES)
-	$(CC) -Wall -O2 $(SOURCES) -o $(APP)
+all: $(SOURCES)
+	$(CC) $(CFLAGS) $(SOURCES) -o $(APP)
 
 clean:
 	-rm -f $(APP)
 
-.PHONY: default clean
+.PHONY: all clean
