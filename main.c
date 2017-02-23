@@ -382,7 +382,7 @@ static int read_timings_file(const char *fname)
 	}
 
 #ifdef CONFIG_FILE_ALL_TIM
-	tim_read = calloc(ARRAY_SIZE(timings), sizeof(*tim_read));
+	tim_read = malloc(ARRAY_SIZE(timings) * sizeof(*tim_read));
 	if (tim_read == NULL) {
 		fprintf(stderr, "Unable to allocate memory for tim_read\n");
 		ret = -2;
