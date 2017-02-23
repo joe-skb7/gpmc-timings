@@ -210,7 +210,9 @@ static struct timing timings[] = {
 	{ "bus-turnaround",		CONFIG6, 3,  0,  true,  true,  },
 };
 
+#ifdef CONFIG_MUL_DOUBLE_LATENCY
 static const size_t para_gran_index = 14;
+#endif
 
 /* Indexes of required timings in "timings" array (see device tree bindings) */
 static const size_t req_timings[] = {
