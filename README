@@ -1,6 +1,35 @@
+Description
+===========
+
 Console application for dealing with GPMC timings.
 Designed for DRA7xx and OMAP-based SoCs.
 
 Features:
  - parsing CONFIG1..CONFIG6 registers and print timings
  - converting timings (specified in text file) to register values
+
+
+Examples
+========
+
+Decode register values:
+
+    $ ./gpmc-timings -p 0x00001010 0x001e1e01 0x00090907 0x0f071d0b 0x001c1f1f \
+                        0x8f070080
+
+See doc/timings.txt for more example values.
+
+Also you can store the output to file, and then encode those decoded values
+back to register values. It can be helpful in case you want to change some
+register values in human readable format, and then obtain corresponding
+registers to write to device. Example:
+
+    $ ./gpmc-timings -p 0x00001010 0x001e1e01 0x00090907 0x0f071d0b 0x001c1f1f \
+                        0x8f070080 >decoded.txt
+
+    // modify some values in file (human-readable values)
+
+    $ ./gpmc-timings -y decoded.txt
+
+After executing the last command you'll see all CONFIG* registers values,
+generated from values in the file.
