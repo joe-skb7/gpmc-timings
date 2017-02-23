@@ -8,6 +8,7 @@ Features:
  - parsing CONFIG1..CONFIG6 registers and print timings
  - converting timings (specified in text file) to register values
 
+If you want each decoded value to be described, uncomment CONFIG_VERBOSE.
 
 Examples
 ========
