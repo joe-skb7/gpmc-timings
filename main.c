@@ -17,7 +17,7 @@
 
 #define ARRAY_SIZE(a)	(sizeof(a) / sizeof(a[0]))
 /* Generate bit mask: bits from "a" to "b" are set to "1" (b > a) */
-#define BIT_MASK(a, b)	(((unsigned)-1 >> (31 - (b))) & ~((1U << (a)) - 1))
+#define BIT_MASK(a, b)	(((unsigned int)-1 >> (31 - (b))) & ~((1U << (a)) - 1))
 
 enum config_idx {
 	CONFIG1 = 0,
@@ -47,7 +47,7 @@ struct timing {
 };
 
 static struct timing timings[] = {
-	{ "wrap-burst", 		CONFIG1, 31, 31, false, false,
+	{ "wrap-burst",			CONFIG1, 31, 31, false, false,
 		2, (struct parse_info []) {
 			{ 0x0, "Sync. burst not supported" },
 			{ 0x1, "Sync. burst supported" },
@@ -399,8 +399,8 @@ static int read_timings_file(const char *fname)
 			if (strcmp(timings[i].name, tim) == 0) {
 				if (tim_read[i]) {
 					fprintf(stderr,
-						"Error: Duplicate timing: "
-						"\"%s\"\n", tim);
+					"Error: Duplicate timing: \"%s\"\n",
+					tim);
 					ret = -3;
 					goto out2;
 				}
@@ -498,8 +498,17 @@ static int do_parse_registers(int argc, char *argv[])
 	}
 
 	/* Parse command line */
-	for (i = 0; i < CONFIG_NUM; ++i)
-		sscanf(argv[i+2], "%x", &config_regs[i]);
+	for (i = 0; i < CONFIG_NUM; ++i) {
+		const char *str = argv[i+2];
+		char *endptr;
+
+		config_regs[i] = strtoul(str, &endptr, 16);
+		if (errno != 0 || endptr == str) {
+			fprintf(stderr, "Unable to convert str to int: %s\n",
+					str);
+			return EXIT_FAILURE;
+		}
+	}
 
 	parse_timings(config_regs);
 	process_paragran();
@@ -559,15 +568,12 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	if (strcmp(argv[1], "-p") == 0) {
+	if (strcmp(argv[1], "-p") == 0)
 		return do_parse_registers(argc, argv);
-	} else if (strcmp(argv[1], "-y") == 0) {
+	else if (strcmp(argv[1], "-y") == 0)
 		return do_yield_registers(argc, argv);
-	} else {
-		fprintf(stderr, "Wrong arguments\n");
-		print_usage(argv[0]);
-		return EXIT_FAILURE;
-	}
 
-	return EXIT_SUCCESS;
+	fprintf(stderr, "Wrong arguments\n");
+	print_usage(argv[0]);
+	return EXIT_FAILURE;
 }
